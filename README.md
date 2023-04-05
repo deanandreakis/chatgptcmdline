@@ -15,3 +15,7 @@ In order to use this command line tool you need to have the following:
   - export OPENAI_API_KEY="\<your secret key here\>"
 
 2. Rust Language Installed: See https://www.rust-lang.org/tools/install
+
+3. Change directory into the root of this project and type "cargo run"
+
+4. Enjoy!
