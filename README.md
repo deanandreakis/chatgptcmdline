@@ -12,4 +12,4 @@ In order to use this command line tool you need to have an account on OpenAI and
 
 In the terminal that you will execute this tool you need to set an environment variable as follows:
 
-export OPENAI_API_KEY="<your secret key here>"
+export OPENAI_API_KEY="\<your secret key here\>"
