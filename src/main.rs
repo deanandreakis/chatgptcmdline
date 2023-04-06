@@ -51,12 +51,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             content: "I am a ChatGPT model. Ask me anything!".to_string(),
         });
 
+    let mut input = String::new();
+
     loop {
         print!("Ask ChatGPT: (Ctrl-C to exit) ");
         io::stdout().flush()?;
-        let mut input = String::new();
         io::stdin().read_line(&mut input)?;
-
         messages.push(ChatMessage {
             role: "user".to_string(),
             content: input.trim().to_string(),
@@ -84,5 +84,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         } else {
             println!("ChatGPT: Failed to generate a response");
         }
+        input.clear();
     }
 }
