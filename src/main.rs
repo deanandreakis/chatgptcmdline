@@ -4,10 +4,6 @@ use std::env;
 use std::io::{self, Write};
 use reqwest_eventsource::{Event, RequestBuilderExt};
 use reqwest_eventsource::EventSource as ReqEventSource;
-//pub use futures_core::stream::Stream;
-
-//use futures::executor; //standard executors to provide a context for futures and streams
-//use futures::executor::ThreadPool;
 use futures::StreamExt;
 
 #[derive(Debug, Serialize, Clone)]
