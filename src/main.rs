@@ -2,6 +2,13 @@ use reqwest::{Client, header::HeaderMap};
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::io::{self, Write};
+use reqwest_eventsource::{Event, RequestBuilderExt};
+use reqwest_eventsource::EventSource as ReqEventSource;
+//pub use futures_core::stream::Stream;
+
+//use futures::executor; //standard executors to provide a context for futures and streams
+//use futures::executor::ThreadPool;
+use futures::StreamExt;
 
 #[derive(Debug, Serialize, Clone)]
 struct ChatMessage {
@@ -13,20 +20,22 @@ struct ChatMessage {
 struct ChatRequest {
     messages: Vec<ChatMessage>,
     model: String,
+    stream: bool,
 }
 
 #[derive(Debug, Deserialize)]
 struct Response {
-    choices: Vec<Choice>,
+    choice: Choice,
 }
 
 #[derive(Debug, Deserialize)]
 struct Choice {
-    message: Message,
+    delta: Delta,
+    finish_reason: String,
 }
 
 #[derive(Debug, Deserialize)]
-struct Message {
+struct Delta {
     content: String,
 }
 
@@ -43,6 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = Client::builder()
         .default_headers(headers)
         .build()?;
+
 
     let mut messages = Vec::new();
 
@@ -65,25 +75,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let chat_request = ChatRequest {
             messages: messages.clone(),
             model: "gpt-3.5-turbo".to_string(),
+            stream: true,
         };
 
-        let response: Response = client
-            .post("https://api.openai.com/v1/chat/completions")
-            .json(&chat_request)
-            .send()
-            .await?
-            .json()
-            .await?;
+        let req_builder = client.post("https://api.openai.com/v1/chat/completions").json(&chat_request);
+        let mut _event_source:ReqEventSource = RequestBuilderExt::eventsource(req_builder)?;
 
-        if let Some(choice) = response.choices.first() {
-            println!("ChatGPT: {}", choice.message.content.trim());
-            messages.push(ChatMessage {
-                role: "assistant".to_string(),
-                content: choice.message.content.trim().to_string(),
-        });
-        } else {
-            println!("ChatGPT: Failed to generate a response");
+        while let Some(event) = _event_source.next().await {
+            match event {
+                Ok(Event::Open) => println!("Connection Open!"),
+                Ok(Event::Message(message)) => println!("Message: {:#?}", message),
+                Err(err) => {
+                    println!("Error: {}", err);
+                    _event_source.close();
+                }
+            }
         }
-        input.clear();
+       input.clear();
     }
 }
