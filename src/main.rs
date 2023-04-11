@@ -5,6 +5,7 @@ use std::io::{self, Write};
 use reqwest_eventsource::{Event, RequestBuilderExt};
 use reqwest_eventsource::EventSource as ReqEventSource;
 use futures::StreamExt;
+use std::fs::File;
 
 #[derive(Debug, Serialize, Clone)]
 struct ChatMessage {
@@ -59,6 +60,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut input = String::new();
 
+    let path = "chatoutput.txt";
+
+    let mut output = File::create(path)?;
+
     loop {
         print!("Ask ChatGPT: (Ctrl-C to exit) ");
         io::stdout().flush()?;
@@ -79,10 +84,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         while let Some(event) = _event_source.next().await {
             match event {
-                Ok(Event::Open) => println!("Connection Open!"),
-                Ok(Event::Message(message)) => println!("Message: {:#?}", message),
+                Ok(Event::Open) => {
+                    println!("Connection Open!");
+                    write!(output, "Connection Open!\n")?;
+                },
+                Ok(Event::Message(message)) => {
+                    println!("Message: {:#?}", message);
+                    write!(output, "Message: {:#?}", message)?;
+                },
                 Err(err) => {
                     println!("Error: {}", err);
+                    write!(output, "Error: {}", err)?;
                     _event_source.close();
                 }
             }
