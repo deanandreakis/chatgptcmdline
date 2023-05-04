@@ -1,7 +1,7 @@
 use reqwest::{Client, header::HeaderMap};
 use serde::{Serialize, Deserialize};
 use std::env;
-use std::io::{self, Write};
+use std::io::{self, Write, stdout};
 use reqwest_eventsource::{Event, RequestBuilderExt};
 use reqwest_eventsource::EventSource as ReqEventSource;
 use futures::StreamExt;
@@ -117,12 +117,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         break;
                     } else {
                       let chat_response: ChatResponse = serde_json::from_str(&message.data)?;
-                      print!("{}",
+                      let mut lock = stdout().lock();
+                      write!(lock, "{}",
                                match chat_response.choices[0].delta.content{
                                    None => "",
                                    Some(ref x) => x,
                                }
-                      );
+                      ).unwrap();
+                      io::stdout().flush().unwrap();
                     }
                 },
                 Err(err) => {
