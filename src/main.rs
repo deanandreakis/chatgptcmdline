@@ -5,7 +5,6 @@ use std::io::{self, Write, stdout};
 use reqwest_eventsource::{Event, RequestBuilderExt};
 use reqwest_eventsource::EventSource as ReqEventSource;
 use futures::StreamExt;
-//use std::fs::File;
 
 #[derive(Debug, Serialize, Clone)]
 struct ChatMessage {
@@ -39,23 +38,15 @@ pub struct Choice {
     #[serde(default)]
     pub index: i64,
 
-    //#[serde(default = "default_resource")]
     pub finish_reason: Option<String>,
 }
 
 /// Represents a delta in the chat API call.
 #[derive(Default, Debug, Deserialize, Serialize, Clone)]
 pub struct Delta {
-    //#[serde(default = "default_resource")]
     pub role: Option<String>,
-
-    //#[serde(default = "default_resource")]
     pub content: Option<String>,
 }
-
-//fn default_resource() -> String {
-//    "".to_string()
-//}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -81,10 +72,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut input = String::new();
 
-//    let path = "chatoutput.txt";
-
-//    let mut output = File::create(path)?;
-
     loop {
         print!("Ask ChatGPT: (Ctrl-C to exit) ");
         io::stdout().flush()?;
@@ -107,10 +94,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             match event {
                 Ok(Event::Open) => {
                     println!("Connection Open!");
-                    //write!(output, "Connection Open!\n")?;
                 },
                 Ok(Event::Message(message)) => {
-                    //println!("{}", &message.data);
                     //at the end , message.data == [DONE]
                     if &message.data == "[DONE]" {
                         println!("{}","");
@@ -129,7 +114,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 },
                 Err(err) => {
                     println!("There is an Error: {}", err);
-                    //write!(output, "Error: {}", err)?;
                     _event_source.close();
                 }
             }
