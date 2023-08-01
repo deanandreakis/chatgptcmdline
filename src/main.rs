@@ -48,6 +48,21 @@ pub struct Delta {
     pub content: Option<String>,
 }
 
+#[derive(Debug, Clone, Copy, Serialize)]
+enum GptModel {
+    Gpt35turbo,
+    Gpt4,
+}
+
+impl std::fmt::Display for GptModel {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            GptModel::Gpt35turbo => write!(f, "gpt-3.5-turbo"),
+            GptModel::Gpt4 => write!(f, "gpt-4"),
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let api_key = env::var("OPENAI_API_KEY").expect("Missing OPENAI_API_KEY environment variable");
@@ -83,7 +98,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let chat_request = ChatRequest {
             messages: messages.clone(),
-            model: "gpt-3.5-turbo".to_string(),
+            model: GptModel::Gpt35turbo.to_string(),
             stream: true,
         };
 
