@@ -98,7 +98,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let chat_request = ChatRequest {
             messages: messages.clone(),
-            model: GptModel::Gpt35turbo.to_string(),
+            model: GptModel::Gpt4.to_string(),
             stream: true,
         };
 
