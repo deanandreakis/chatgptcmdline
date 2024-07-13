@@ -58,7 +58,7 @@ impl std::fmt::Display for GptModel {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             GptModel::Gpt35turbo => write!(f, "gpt-3.5-turbo"),
-            GptModel::Gpt4 => write!(f, "gpt-4"),
+            GptModel::Gpt4 => write!(f, "gpt-4o"),
         }
     }
 }
